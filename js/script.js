@@ -12,60 +12,64 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 200 }
+      gravity: { y: 300 }
     }
   },
   scene: {
     preload: preload,
-    create: create
+    create: create,
+    update: update
   }
 };
 
 const game = new Phaser.Game(config);
-let text;
-let sky;
+
+let player;
+let cursors;
+let touch;
 
 function preload() {
-  this.load.setBaseURL('http://labs.phaser.io');
-
-  this.load.image('sky', 'assets/skies/space3.png');
-  this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-  this.load.image('red', 'assets/particles/red.png');
+  this.load.image('background', 'img/background.jpg');
+  this.load.spritesheet('hero', 'img/hero.png', { frameWidth: 81, frameHeight: 87 });
 }
 
 function create() {
-  sky = this.add.image(400, 300, 'sky');
+  this.add.image(400, 225, 'background');
 
-  text = this.add.text(config.scale.width / 2, config.scale.height / 2, 'Please set your\nphone to landscape', { font: '48px sans-serif', fill: '#ffffff', align: 'center' }).setOrigin(0.5);
+  player = this.physics.add.sprite(400, 500, 'hero');
 
-  checkOriention(this.scale.orientation);
+  player.setCollideWorldBounds(true);
 
-  this.scale.on('orientationchange', checkOriention, this);
-
-  const particles = this.add.particles('red');
-
-  const emitter = particles.createEmitter({
-    speed: 100,
-    scale: { start: 1, end: 0 },
-    blendMode: 'ADD'
+  this.anims.create({
+    key: 'walk',
+    frames: this.anims.generateFrameNumbers('hero', { start: 0, end: 1 }),
+    frameRate: 10,
+    repeat: -1
   });
 
-  const logo = this.physics.add.image(400, 100, 'logo');
+  this.anims.create({
+    key: 'up',
+    frames: this.anims.generateFrameNumbers('hero', { start: 2, end: 2 }),
+    frameRate: 10,
+  });
 
-  logo.setVelocity(100, 200);
-  logo.setBounce(1, 1);
-  logo.setCollideWorldBounds(true);
-
-  emitter.startFollow(logo);
+  cursors = this.input.keyboard.createCursorKeys();
 }
 
-function checkOriention(orientation) {
-  if (orientation === Phaser.Scale.PORTRAIT) {
-    sky.alpha = 0.2;
-    text.setVisible(true);
-  }
-  else if (orientation === Phaser.Scale.LANDSCAPE) {
-    sky.alpha = 1;
-    text.setVisible(false);
+function update() {
+  if (cursors.up.isDown || touch && player.body.blocked.down) {
+    player.setVelocityY(-300);
+
+    player.anims.play('up', true);
+  } else if (player.body.blocked.down) {
+    player.anims.play('walk', true);
   }
 }
+
+document.addEventListener('touchstart', () => {
+  touch = true;
+});
+
+document.addEventListener('touchend', () => {
+  touch = false;
+});
