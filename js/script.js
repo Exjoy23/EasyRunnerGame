@@ -42,14 +42,14 @@ function create() {
 
   this.anims.create({
     key: 'walk',
-    frames: this.anims.generateFrameNumbers('hero', { start: 0, end: 1 }),
-    frameRate: 10,
+    frames: this.anims.generateFrameNumbers('hero', { start: 0, end: 3 }),
+    frameRate: 8,
     repeat: -1
   });
 
   this.anims.create({
     key: 'up',
-    frames: this.anims.generateFrameNumbers('hero', { start: 2, end: 2 }),
+    frames: this.anims.generateFrameNumbers('hero', { start: 4, end: 4 }),
     frameRate: 10,
   });
 
@@ -57,7 +57,7 @@ function create() {
 }
 
 function update() {
-  if (cursors.up.isDown || touch && player.body.blocked.down) {
+  if ((cursors.up.isDown || touch) && player.body.blocked.down) {
     player.setVelocityY(-300);
 
     player.anims.play('up', true);
