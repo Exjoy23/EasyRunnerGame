@@ -25,20 +25,31 @@ const config = {
 const game = new Phaser.Game(config);
 
 let player;
-let cursors;
-let touch;
+let jump;
+let platforms;
+let platforms1;
+let platforms2;
 
 function preload() {
-  this.load.image('background', 'img/background.jpg');
-  this.load.spritesheet('hero', 'img/hero.png', { frameWidth: 81, frameHeight: 87 });
+  this.load.image('background', 'img/background.png');
+  this.load.image('meteorite', 'img/meteorite.png');
+  this.load.spritesheet('hero', 'img/hero.png', { frameWidth: 104, frameHeight: 116 });
 }
 
 function create() {
-  this.add.image(400, 225, 'background');
+  // this.add.image(400, 225, 'background');
 
-  player = this.physics.add.sprite(400, 500, 'hero');
+  this.bg = this.add.tileSprite(0, 0, 800, 450, 'background').setOrigin(0, 0);
 
-  player.setCollideWorldBounds(true);
+  player = this.physics.add.sprite(400, 100, 'hero');
+
+  // player.setCollideWorldBounds(true);
+
+  platforms = this.physics.add.sprite(600, 350, 'meteorite');
+  platforms1 = this.physics.add.sprite(1000, 350, 'meteorite');
+  platforms2 = this.physics.add.sprite(1400, 350, 'meteorite');
+
+  // platforms.setCollideWorldBounds(true);
 
   this.anims.create({
     key: 'walk',
@@ -49,27 +60,48 @@ function create() {
 
   this.anims.create({
     key: 'up',
-    frames: this.anims.generateFrameNumbers('hero', { start: 4, end: 4 }),
-    frameRate: 10,
+    frames: this.anims.generateFrameNumbers('hero', { start: 4, end: 5 }),
+    frameRate: 8,
+    repeat: -1
   });
 
-  cursors = this.input.keyboard.createCursorKeys();
+  player.play('walk');
+
+  this.physics.add.collider(player, platforms);
+  this.physics.add.collider(player, platforms1);
+  this.physics.add.collider(player, platforms2);
 }
 
 function update() {
-  if ((cursors.up.isDown || touch) && player.body.blocked.down) {
+  if (jump && (player.body.blocked.down || player.body.touching.down)) {
     player.setVelocityY(-300);
 
     player.anims.play('up', true);
-  } else if (player.body.blocked.down) {
+  } else if (player.body.blocked.down || player.body.touching.down) {
     player.anims.play('walk', true);
   }
+
+  this.bg.tilePositionX += 1;
+  platforms.setVelocityX(-180);
+  platforms.setVelocityY(0);
+  platforms1.setVelocityX(-180);
+  platforms1.setVelocityY(0);
+  platforms2.setVelocityX(-180);
+  platforms2.setVelocityY(0);
 }
 
 document.addEventListener('touchstart', () => {
-  touch = true;
+  jump = true;
 });
 
 document.addEventListener('touchend', () => {
-  touch = false;
+  jump = false;
+});
+
+document.addEventListener('keydown', () => {
+  jump = true;
+});
+
+document.addEventListener('keyup', () => {
+  jump = false;
 });
