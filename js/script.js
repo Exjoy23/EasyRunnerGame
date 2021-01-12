@@ -26,15 +26,20 @@ const game = new Phaser.Game(config);
 
 let player;
 let jump;
+let jumpSound;
 let score = 0;
 let platformPositionX = 700;
 let platformPositionY = 300;
-let jumpSound;
+let platformMoveX = -250;
+let platformMoveY = 0;
 let platformSound;
 let platformTouch = true;
 let endGameSound;
 
 const platforms = [];
+
+const scoreText = document.querySelector('.page__score');
+const play = document.querySelector('.page__play');
 
 function preload() {
   this.load.image('background', 'img/background.png');
@@ -46,6 +51,26 @@ function preload() {
 }
 
 function create() {
+  play.addEventListener('click', () => {
+    player.destroy(true);
+    player = this.physics.add.sprite(400, 100, 'hero');
+    platforms.pop();
+    platforms.pop();
+    platforms.pop();
+    this.physics.add.collider(player, platforms);
+    score = 0;
+    platforms.push(this.physics.add.sprite(700, 300, 'platform'));
+    platforms.push(this.physics.add.sprite(1100, 300, 'platform'));
+    platforms.push(this.physics.add.sprite(1400, 300, 'platform'));
+    platformMoveX = -250;
+    platformMoveY = 0;
+    play.classList.add('page__play--hide');
+  });
+
+  // pause.addEventListener('click', () => {
+  //   this.scene.pause();
+  // });
+
   jumpSound = this.sound.add('jump');
   platformSound = this.sound.add('platform');
   endGameSound = this.sound.add('endgame');
@@ -82,9 +107,14 @@ function create() {
 
 function update() {
 
+  // Score
+  scoreText.textContent = `SCORE: ${score}`;
+
   // End game
   if (player.y >= 500) {
-    platforms.length = 0;
+    platformMoveY = 500;
+    platformMoveX = 0;
+    play.classList.remove('page__play--hide');
 
     if (player.y >= 500 && player.y <= 510) {
       endGameSound.play();
@@ -114,15 +144,15 @@ function update() {
   if (platforms.length < 3) {
     platforms.push(this.physics.add.sprite(platformPositionX, platformPositionY, 'platform'));
   }
-
   platforms.forEach(item => {
     if (item.x < 300 && !player.body.touching.down) {
       platforms.shift();
       score++;
     }
-    item.setVelocityY(0);
-    item.setVelocityX(-250);
+    item.setVelocityY(platformMoveY);
+    item.setVelocityX(platformMoveX);
     item.anims.play('move', true);
+
     platformPositionX = item.x + 470 - Math.floor(Math.random() * 100);
 
     if (Math.random() < 0.5 && item.y <= 310) {
@@ -130,10 +160,6 @@ function update() {
     } else if (item.y >= 310) {
       platformPositionY = item.y - Math.floor(Math.random() * 90);
     }
-
-    // Test position platforms
-    // platformPositionX = item.x + 470;
-    // platformPositionY = item.y - 90;
   });
 }
 
