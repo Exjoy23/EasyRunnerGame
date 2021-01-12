@@ -27,23 +27,34 @@ const game = new Phaser.Game(config);
 let player;
 let jump;
 let score = 0;
+let platformPositionX = 700;
+let platformPositionY = 300;
+let jumpSound;
+let platformSound;
+let platformTouch = true;
+let endGameSound;
 
 const platforms = [];
-
-let platformPositionX = 600;
-let platformPositionY = 350;
 
 function preload() {
   this.load.image('background', 'img/background.png');
   this.load.spritesheet('platform', 'img/platform.png', { frameWidth: 180, frameHeight: 33 });
   this.load.spritesheet('hero', 'img/hero.png', { frameWidth: 78, frameHeight: 87 });
+  this.load.audio('jump', 'audio/jump.wav');
+  this.load.audio('platform', 'audio/platform.wav');
+  this.load.audio('endgame', 'audio/endgame.wav');
 }
 
 function create() {
-  this.bg = this.add.tileSprite(0, 0, 800, 450, 'background').setOrigin(0, 0);
+  jumpSound = this.sound.add('jump');
+  platformSound = this.sound.add('platform');
+  endGameSound = this.sound.add('endgame');
+
+  this.background = this.add.tileSprite(0, 0, 800, 450, 'background').setOrigin(0, 0);
 
   player = this.physics.add.sprite(400, 100, 'hero');
 
+  // Player animation
   this.anims.create({
     key: 'walk',
     frames: this.anims.generateFrameNumbers('hero', { start: 0, end: 3 }),
@@ -58,6 +69,7 @@ function create() {
     repeat: -1
   });
 
+  // Platform animation
   this.anims.create({
     key: 'move',
     frames: this.anims.generateFrameNumbers('platform', { start: 0, end: 3 }),
@@ -65,48 +77,67 @@ function create() {
     repeat: -1
   });
 
-  player.play('walk');
-
   this.physics.add.collider(player, platforms);
 }
 
 function update() {
-  if (player.y > 500) {
+
+  // End game
+  if (player.y >= 500) {
     platforms.length = 0;
+
+    if (player.y >= 500 && player.y <= 510) {
+      endGameSound.play();
+    }
   }
 
-  if (jump && (player.body.blocked.down || player.body.touching.down)) {
+  // Player jump & walk
+  if (jump && player.body.touching.down) {
     player.setVelocityY(-360);
-
     player.anims.play('up', true);
-  } else if (player.body.blocked.down || player.body.touching.down) {
+    jumpSound.play();
+    platformTouch = true;
+  } else if (player.body.touching.down) {
     player.anims.play('walk', true);
+    if (platformTouch) {
+      platformSound.play();
+      platformTouch = false;
+    }
+  } else {
+    player.anims.play('up', true);
   }
 
-  this.bg.tilePositionX += 1;
+  // Background move
+  this.background.tilePositionX += 1;
 
+  // Platforms generator
   if (platforms.length < 3) {
-    // if (Math.random() < 0.3) {
-    //   platforms.push(this.physics.add.sprite(platformPositionX, platformPositionY, 'platform').setScale(1.3));
-    // } else {
-    //   platforms.push(this.physics.add.sprite(platformPositionX, platformPositionY, 'platform'));
-    // }
     platforms.push(this.physics.add.sprite(platformPositionX, platformPositionY, 'platform'));
   }
 
   platforms.forEach(item => {
-    if (item.x < 250) {
+    if (item.x < 300 && !player.body.touching.down) {
       platforms.shift();
       score++;
     }
-    item.setVelocityY(-5);
+    item.setVelocityY(0);
     item.setVelocityX(-250);
     item.anims.play('move', true);
-    platformPositionX = item.x + 500 - Math.floor(Math.random() * 100);
-    platformPositionY = 350 - Math.floor(Math.random() * 100);
+    platformPositionX = item.x + 470 - Math.floor(Math.random() * 100);
+
+    if (Math.random() < 0.5 && item.y <= 310) {
+      platformPositionY = item.y + Math.floor(Math.random() * 90);
+    } else if (item.y >= 310) {
+      platformPositionY = item.y - Math.floor(Math.random() * 90);
+    }
+
+    // Test position platforms
+    // platformPositionX = item.x + 470;
+    // platformPositionY = item.y - 90;
   });
 }
 
+// Control
 document.addEventListener('touchstart', () => {
   jump = true;
 });
@@ -120,5 +151,13 @@ document.addEventListener('keydown', () => {
 });
 
 document.addEventListener('keyup', () => {
+  jump = false;
+});
+
+document.addEventListener('mousedown', () => {
+  jump = true;
+});
+
+document.addEventListener('mouseup', () => {
   jump = false;
 });
