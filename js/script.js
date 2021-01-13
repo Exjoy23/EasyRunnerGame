@@ -24,6 +24,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+let scene;
 let player;
 let jump;
 let jumpSound;
@@ -35,11 +36,15 @@ let platformMoveY = 0;
 let platformSound;
 let platformTouch = true;
 let endGameSound;
+let startGame = false;
 
-const platforms = [];
+// const platforms = [];
+let platforms;
 
 const scoreText = document.querySelector('.page__score');
 const play = document.querySelector('.page__play');
+const pause = document.querySelector('.page__pause');
+const resume = document.querySelector('.page__resume');
 
 function preload() {
   this.load.image('background', 'img/background.png');
@@ -51,26 +56,12 @@ function preload() {
 }
 
 function create() {
-  play.addEventListener('click', () => {
-    player.destroy(true);
-    player = this.physics.add.sprite(400, 100, 'hero');
-    platforms.pop();
-    platforms.pop();
-    platforms.pop();
-    this.physics.add.collider(player, platforms);
-    score = 0;
-    platforms.push(this.physics.add.sprite(700, 300, 'platform'));
-    platforms.push(this.physics.add.sprite(1100, 300, 'platform'));
-    platforms.push(this.physics.add.sprite(1400, 300, 'platform'));
-    platformMoveX = -250;
-    platformMoveY = 0;
-    play.classList.add('page__play--hide');
-  });
+  scene = this.scene;
 
-  // pause.addEventListener('click', () => {
-  //   this.scene.pause();
-  // });
-
+  if (!startGame) {
+    scene.stop();
+  }
+  platforms = [];
   jumpSound = this.sound.add('jump');
   platformSound = this.sound.add('platform');
   endGameSound = this.sound.add('endgame');
@@ -112,8 +103,7 @@ function update() {
 
   // End game
   if (player.y >= 500) {
-    platformMoveY = 500;
-    platformMoveX = 0;
+    platforms.length = 0;
     play.classList.remove('page__play--hide');
 
     if (player.y >= 500 && player.y <= 510) {
@@ -144,6 +134,7 @@ function update() {
   if (platforms.length < 3) {
     platforms.push(this.physics.add.sprite(platformPositionX, platformPositionY, 'platform'));
   }
+
   platforms.forEach(item => {
     if (item.x < 300 && !player.body.touching.down) {
       platforms.shift();
@@ -163,8 +154,50 @@ function update() {
   });
 }
 
+function playGame() {
+  startGame = true;
+  scene.restart();
+  platformPositionX = 700;
+  platformPositionY = 300;
+  score = 0;
+  play.classList.add('page__play--hide');
+  pause.classList.remove('page__pause--hide');
+}
+
+function pauseGame() {
+  scene.pause();
+  pause.classList.add('page__pause--hide');
+  resume.classList.remove('page__resume--hide');
+}
+
+function resumeGame() {
+  scene.resume();
+  pause.classList.remove('page__pause--hide');
+  resume.classList.add('page__resume--hide');
+}
+
+play.addEventListener('click', () => {
+  playGame();
+});
+
+pause.addEventListener('touchstart', () => {
+  pauseGame();
+});
+
+pause.addEventListener('mousedown', () => {
+  pauseGame();
+});
+
+resume.addEventListener('touchstart', () => {
+  resumeGame();
+});
+
+resume.addEventListener('mousedown', () => {
+  resumeGame();
+});
+
 // Control
-document.addEventListener('touchstart', () => {
+document.addEventListener('touchstart', (evt) => {
   jump = true;
 });
 
@@ -180,7 +213,7 @@ document.addEventListener('keyup', () => {
   jump = false;
 });
 
-document.addEventListener('mousedown', () => {
+document.addEventListener('mousedown', (evt) => {
   jump = true;
 });
 
