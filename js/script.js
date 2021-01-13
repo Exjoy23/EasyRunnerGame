@@ -162,6 +162,7 @@ function playGame() {
   score = 0;
   play.classList.add('page__play--hide');
   pause.classList.remove('page__pause--hide');
+  resume.classList.add('page__resume--hide');
 }
 
 function pauseGame() {
@@ -176,7 +177,11 @@ function resumeGame() {
   resume.classList.add('page__resume--hide');
 }
 
-play.addEventListener('click', () => {
+play.addEventListener('touchstart', () => {
+  playGame();
+});
+
+play.addEventListener('mousedown', () => {
   playGame();
 });
 

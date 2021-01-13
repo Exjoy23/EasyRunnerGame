@@ -8,6 +8,12 @@
   url("../fonts/Pixel.woff") format("woff");
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .page__body {
   position: relative;
 
@@ -34,6 +40,8 @@
   color: #ffffff;
 
   background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
   border: none;
   outline: none;
 
@@ -44,8 +52,10 @@
 
 .page__play {
   position: absolute;
-  top: 50%;
+  top: calc(50% - 25px);
   left: 50%;
+
+  height: 50px;
 
   font-size: 60px;
 
@@ -58,9 +68,18 @@
   top: 10px;
   right: 10px;
 
-  padding: 10px;
+  width: 50px;
+  height: 50px;
 
   font-size: 40px;
+}
+
+.page__pause {
+  background-image: url("../img/pause.png");
+}
+
+.page__resume {
+  background-image: url("../img/play.png");
 }
 
 .page__play--hide {
