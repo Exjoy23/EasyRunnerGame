@@ -40,8 +40,6 @@ let playSound;
 let pauseSound;
 let resumeSound;
 let startGame = false;
-
-// const platforms = [];
 let platforms;
 
 const scoreText = document.querySelector('.page__score');
@@ -148,6 +146,11 @@ function update() {
     if (item.x < 300 && !player.body.touching.down) {
       platforms.shift();
       score++;
+
+      // Change platform speed
+      if (platformMoveX > -300) {
+        platformMoveX -= 1;
+      }
     }
     item.setVelocityY(platformMoveY);
     item.setVelocityX(platformMoveX);
@@ -163,11 +166,13 @@ function update() {
   });
 }
 
+// Game menu
 function playGame() {
   startGame = true;
   scene.restart();
   platformPositionX = 700;
   platformPositionY = 300;
+  platformMoveX = -250;
   score = 0;
   play.classList.add('page__play--hide');
   pause.classList.remove('page__pause--hide');
@@ -214,7 +219,7 @@ resume.addEventListener('mousedown', () => {
 });
 
 // Control
-document.addEventListener('touchstart', (evt) => {
+document.addEventListener('touchstart', () => {
   jump = true;
 });
 
@@ -230,7 +235,7 @@ document.addEventListener('keyup', () => {
   jump = false;
 });
 
-document.addEventListener('mousedown', (evt) => {
+document.addEventListener('mousedown', () => {
   jump = true;
 });
 
