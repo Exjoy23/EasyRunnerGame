@@ -48,7 +48,6 @@
   left: 50%;
 
   font-size: 60px;
-  line-height: 0;
 
   transform: translateX(-50%);
 }
