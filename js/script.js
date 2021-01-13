@@ -3,7 +3,7 @@
 const config = {
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.ENVELOP,
     parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 800,

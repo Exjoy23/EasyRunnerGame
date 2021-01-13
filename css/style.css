@@ -26,8 +26,8 @@
 
 .page__score {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 30px;
+  left: 40px;
 
   font-size: 20px;
   color: #ffffff;
@@ -65,8 +65,8 @@
 .page__pause,
 .page__resume {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
 
   width: 50px;
   height: 50px;
