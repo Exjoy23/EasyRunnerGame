@@ -36,6 +36,9 @@ let platformMoveY = 0;
 let platformSound;
 let platformTouch = true;
 let endGameSound;
+let playSound;
+let pauseSound;
+let resumeSound;
 let startGame = false;
 
 // const platforms = [];
@@ -53,6 +56,9 @@ function preload() {
   this.load.audio('jump', 'audio/jump.wav');
   this.load.audio('platform', 'audio/platform.wav');
   this.load.audio('endgame', 'audio/endgame.wav');
+  this.load.audio('play', 'audio/play.wav');
+  this.load.audio('pause', 'audio/pause.wav');
+  this.load.audio('resume', 'audio/resume.wav');
 }
 
 function create() {
@@ -65,6 +71,9 @@ function create() {
   jumpSound = this.sound.add('jump');
   platformSound = this.sound.add('platform');
   endGameSound = this.sound.add('endgame');
+  playSound = this.sound.add('play');
+  pauseSound = this.sound.add('pause');
+  resumeSound = this.sound.add('resume');
 
   this.background = this.add.tileSprite(0, 0, 800, 450, 'background').setOrigin(0, 0);
 
@@ -163,18 +172,21 @@ function playGame() {
   play.classList.add('page__play--hide');
   pause.classList.remove('page__pause--hide');
   resume.classList.add('page__resume--hide');
+  playSound.play();
 }
 
 function pauseGame() {
   scene.pause();
   pause.classList.add('page__pause--hide');
   resume.classList.remove('page__resume--hide');
+  pauseSound.play();
 }
 
 function resumeGame() {
   scene.resume();
   pause.classList.remove('page__pause--hide');
   resume.classList.add('page__resume--hide');
+  resumeSound.play();
 }
 
 play.addEventListener('touchstart', () => {
