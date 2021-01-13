@@ -58,9 +58,9 @@ function preload() {
 function create() {
   scene = this.scene;
 
-  // if (!startGame) {
-  //   scene.stop();
-  // }
+  if (!startGame) {
+    scene.stop();
+  }
   platforms = [];
   jumpSound = this.sound.add('jump');
   platformSound = this.sound.add('platform');
